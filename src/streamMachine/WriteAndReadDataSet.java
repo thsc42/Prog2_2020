@@ -1,4 +1,4 @@
-package filepersistence;
+package streamMachine;
 
 import java.io.*;
 

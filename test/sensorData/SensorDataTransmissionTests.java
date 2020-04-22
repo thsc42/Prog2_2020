@@ -1,6 +1,6 @@
 package sensorData;
 
-import filepersistence.SensorDataStorage;
+import streamMachine.StreamMachine;
 import org.junit.Assert;
 import org.junit.Test;
 import transmission.DataConnection;
@@ -27,7 +27,7 @@ public class SensorDataTransmissionTests {
 
         // create storage
         // TODO: create object that implements SensorDataStorage
-        SensorDataStorage dataStorage = null;
+        StreamMachine dataStorage = null;
 
         // create connections
         DataConnection receiverConnection = new DataConnector(PORTNUMBER);
@@ -53,7 +53,7 @@ public class SensorDataTransmissionTests {
         sensorDataSender.sendData(sensorName, timeStamp, valueSet);
 
         // test if stored
-        SensorDataStorage dataStorageReceived = sensorDataReceiver.getStorage();
+        StreamMachine dataStorageReceived = sensorDataReceiver.getStorage();
 
         // TODO - get data and test
 

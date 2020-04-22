@@ -1,6 +1,5 @@
 package sensorData;
 
-import filepersistence.SensorDataStorage;
 import transmission.DataConnection;
 
 import java.io.IOException;

@@ -1,11 +1,10 @@
-package filepersistence;
+package streamMachine;
 
 /**
  * We assume: Each sensor gets its own storage engine. There wont be a parameter
  * sensor name.
  */
-public interface SensorDataStorage {
-
+public interface StreamMachine {
     /**
      * This method can be called by a sensor to save a data set.
      * @param time UNIX time when measurement took place
@@ -14,10 +13,19 @@ public interface SensorDataStorage {
      */
     void saveData(long time, float[] values) throws PersistenceException;
 
-    // what else could we need? Get inspired by e.g. this:
-    // https://docs.oracle.com/javase/7/docs/api/java/util/List.html
+    /**
+     * @return number of data sets
+     */
+    int size();
 
-    // size() is usually a good idea
-    // get at data set at a position as well.
-    // what can go wrong.... Declare methods. Don't forget exceptions. Write comments!
+    /**
+     *
+     * @param index position of data set
+     */
+    SensorDataSet getDataSet(int index) throws PersistenceException;
+
+    /**
+     * remove any data
+     */
+    void clean();
 }

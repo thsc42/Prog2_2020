@@ -1,18 +1,18 @@
 package sensorData;
 
-import filepersistence.SensorDataStorage;
+import streamMachine.StreamMachine;
 import transmission.DataConnection;
 
 public class SensorDataReceiver {
     private final DataConnection connection;
-    private final SensorDataStorage storage;
+    private final StreamMachine storage;
 
-    public SensorDataReceiver(DataConnection connection, SensorDataStorage storage) {
+    public SensorDataReceiver(DataConnection connection, StreamMachine storage) {
         this.connection = connection;
         this.storage = storage;
     }
 
-    SensorDataStorage getStorage() {
+    StreamMachine getStorage() {
         return storage;
     }
 }
