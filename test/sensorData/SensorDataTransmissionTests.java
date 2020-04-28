@@ -30,7 +30,7 @@ public class SensorDataTransmissionTests {
         StreamMachine dataStorage = null;
 
         // create connections
-        DataConnection receiverConnection = new DataConnector(PORTNUMBER);
+        DataConnection receiverConnection = new DataConnector("localhost", PORTNUMBER);
 
         // create receiver
         SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(receiverConnection, dataStorage);
@@ -40,7 +40,7 @@ public class SensorDataTransmissionTests {
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // create connections
-        DataConnection senderConnection = new DataConnector("localhost", PORTNUMBER);
+        DataConnection senderConnection = new DataConnector(PORTNUMBER);
 
         // create sender
         SensorDataSender sensorDataSender = new SensorDataSender(senderConnection);
