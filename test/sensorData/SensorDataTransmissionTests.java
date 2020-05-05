@@ -1,8 +1,11 @@
 package sensorData;
 
+import streamMachine.PersistenceException;
+import streamMachine.SensorDataSet;
 import streamMachine.StreamMachine;
 import org.junit.Assert;
 import org.junit.Test;
+import streamMachine.StreamMachineFS;
 import transmission.DataConnection;
 import transmission.DataConnector;
 
@@ -10,61 +13,53 @@ import java.io.IOException;
 
 public class SensorDataTransmissionTests {
     private static final int PORTNUMBER = 9876;
+    private static final String SENSOR_NAME = "goodOldSensor";
 
     @Test
-    public void gutTransmissionTest() throws IOException {
+    public void gutTransmissionTest() throws IOException, PersistenceException, InterruptedException {
         // create example data set
-        String sensorName = "MyGoodOldSensor"; // does not change
         long timeStamp = System.currentTimeMillis();
         float[] valueSet = new float[3];
         valueSet[0] = (float) 0.7;
         valueSet[1] = (float) 1.2;
         valueSet[2] = (float) 2.1;
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////
-        //                                              receiver side                                        //
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////
+        // create storage - for layer 7 server
+        StreamMachine dataStorage = new StreamMachineFS(SENSOR_NAME);
+        dataStorage.clean();
 
-        // create storage
-        // TODO: create object that implements SensorDataStorage
-        StreamMachine dataStorage = null;
+        // create (layer 4: tcp) server
+        DataConnection receiverConnection = new DataConnector(PORTNUMBER);
 
-        // create connections
-        DataConnection receiverConnection = new DataConnector("localhost", PORTNUMBER);
+        // create (layer 4) client and connect
+        DataConnection senderConnection = new DataConnector("localhost", PORTNUMBER);
 
-        // create receiver
-        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(receiverConnection, dataStorage);
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////
-        //                                              sender side                                          //
-        ///////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // create connections
-        DataConnection senderConnection = new DataConnector(PORTNUMBER);
-
-        // create sender
+        // create (layer 7: our sensor data protocol) sender
         SensorDataSender sensorDataSender = new SensorDataSender(senderConnection);
+
+        // create layer 7 receiver and establish layer 7 connection
+        SensorDataReceiver sensorDataReceiver = new SensorDataReceiver(receiverConnection, dataStorage);
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
         //                               execute communication and test                                      //
         ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // send data with TCP
-        sensorDataSender.sendData(sensorName, timeStamp, valueSet);
+        // issue layer 7 command - which uses tcp as layer 4 protocol
+        sensorDataSender.sendData(SENSOR_NAME, timeStamp, valueSet);
 
-        // test if stored
+        // stop unit test thread a moment to finish transmission
+        Thread.sleep(1);
+
+        // get receiver storage
         StreamMachine dataStorageReceived = sensorDataReceiver.getStorage();
 
-        // TODO - get data and test
-
-        // just dummy values
-        String sensorNameReceived = "dummy";
-        long timeStampReceived = 0; // dummy
-        float[] valueSetReceived = new float[3];
+        // get received data
+        SensorDataSet dataSet = dataStorageReceived.getDataSet(0);
+        long timeStampReceived = dataSet.getTime();
+        float[] valueSetReceived = dataSet.getValues();
 
         // test
-        Assert.assertEquals(sensorName, sensorNameReceived);
         Assert.assertEquals(timeStamp, timeStampReceived);
-        // TODO: test values
+        Assert.assertArrayEquals(valueSet, valueSetReceived, 0);
     }
 }

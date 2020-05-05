@@ -6,8 +6,9 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class DataConnector implements DataConnection {
-    private final Socket socket;
+public class DataConnector extends Thread implements DataConnection {
+    private ServerSocket serverSocket;
+    private Socket socket;
 
     /**
      * Create client side - open connection to address / port
@@ -22,8 +23,23 @@ public class DataConnector implements DataConnection {
      * @param port
      */
     public DataConnector(int port) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(port);
-        this.socket = serverSocket.accept();
+        this.serverSocket = new ServerSocket(port);
+
+        this.start();
+
+        try {
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            // nothing
+        }
+    }
+
+    public void run() {
+        try {
+            this.socket = serverSocket.accept();
+        } catch (IOException e) {
+            // keine idee was zu tun
+        }
     }
 
     @Override

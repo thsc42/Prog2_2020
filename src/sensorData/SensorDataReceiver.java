@@ -1,6 +1,5 @@
 package sensorData;
 
-import streamMachine.PersistenceException;
 import streamMachine.StreamMachine;
 import transmission.DataConnection;
 
@@ -11,25 +10,15 @@ public class SensorDataReceiver {
     private final DataConnection connection;
     private final StreamMachine storage;
 
-    public SensorDataReceiver(DataConnection connection, StreamMachine storage) {
+    public SensorDataReceiver(DataConnection connection, StreamMachine storage) throws IOException {
         this.connection = connection;
         this.storage = storage;
-    }
 
-    private void readDataSet() throws IOException, PersistenceException {
-        DataInputStream dis = this.connection.getDataInputStream();
+        SensorDataSetReader reader = new SensorDataSetReader(
+                new DataInputStream(connection.getDataInputStream()),
+                storage);
 
-        // read from tcp
-        String name = dis.readUTF();
-        long time = dis.readLong();
-        int len = dis.readInt();
-        float[] values = new float[len];
-        for(int i = 0; i < len; i++) {
-            values[i] = dis.readFloat();
-        }
-
-        // write into machine
-        this.storage.saveData(time, values);
+        reader.start();
     }
 
     StreamMachine getStorage() {
