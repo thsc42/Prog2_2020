@@ -32,7 +32,7 @@ class SensorDataSetReader extends Thread {
 
         } catch (IOException | PersistenceException e) {
             // create error log message
-            System.err.println("problems when reading / writing sensor data");
+            System.err.println("problems when reading / wridanating sensor data");
         }
     }
 }
