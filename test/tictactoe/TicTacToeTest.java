@@ -26,6 +26,6 @@ public class TicTacToeTest {
         TicTacToeUsage activeGame = game1.isActive() ? game1 : game2;
 
         activeGame.set(0,0);
-        Assert.assertFalse(game1.isActive());
+        Assert.assertFalse(activeGame.isActive());
     }
 }
