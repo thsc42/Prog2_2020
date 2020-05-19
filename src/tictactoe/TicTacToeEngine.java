@@ -3,15 +3,21 @@ package tictactoe;
 import java.io.IOException;
 import java.util.Random;
 
-public class TicTacToeEngine implements TicTacToeReceive, TicTacToeSender {
+public class TicTacToeEngine implements TicTacToeReceive, TicTacToeUsage {
     public static final int UNDEFINED_DICE = -1;
+    private final TicTacToeSender sender;
 
     private TicTacToeStatus status;
     private int sentDice = UNDEFINED_DICE;
 
-    public TicTacToeEngine() {
+    public TicTacToeEngine(TicTacToeSender sender) {
         this.status = TicTacToeStatus.START;
+        this.sender = sender;
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                  remote engine support                                     //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void receiveDice(int random) throws IOException, StatusException {
@@ -42,8 +48,20 @@ public class TicTacToeEngine implements TicTacToeReceive, TicTacToeSender {
         // gibt es eine Reihe von drei Steinen? -> TicTacToeStatus.LOST
     }
 
+    public void sendSet(int x, int y) throws IOException, StatusException {
+        if(this.status != TicTacToeStatus.ACTIVE) {
+            throw new StatusException();
+        }
+
+        // wenn nun drei steine in einer Reihe - TicTacToeStatus.WON
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    //                                  user interface support                                    //
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
     @Override
-    public void sendDice(int random) throws IOException, StatusException {
+    public void doDice() throws StatusException, IOException {
         if(this.status != TicTacToeStatus.START) {
             throw new StatusException();
         }
@@ -51,17 +69,19 @@ public class TicTacToeEngine implements TicTacToeReceive, TicTacToeSender {
         Random r = new Random();
         this.sentDice = r.nextInt();
 
-        // sende den Wert über TCP
+        // sende den Wert über den Sender
+        this.sender.sendDice(this.sentDice);
 
         this.status = TicTacToeStatus.DICE_SENT;
     }
 
     @Override
-    public void sendSet(int x, int y) throws IOException, StatusException {
-        if(this.status != TicTacToeStatus.ACTIVE) {
-            throw new StatusException();
-        }
+    public boolean isActive() {
+        return this.status == TicTacToeStatus.ACTIVE;
+    }
 
-        // wenn nun drei steine in einer Reihe - TicTacToeStatus.WON
+    @Override
+    public void set(int x, int y) throws TicTacToeException, StatusException {
+
     }
 }
