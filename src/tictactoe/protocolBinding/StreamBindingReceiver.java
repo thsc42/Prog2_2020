@@ -1,6 +1,7 @@
 package tictactoe.protocolBinding;
 
 import tictactoe.StatusException;
+import tictactoe.TicTacToeException;
 import tictactoe.TicTacToeReceive;
 
 import java.io.DataInputStream;
@@ -24,7 +25,12 @@ public class StreamBindingReceiver extends Thread {
     public void readSet() throws IOException, StatusException {
         int x = this.dis.readInt();
         int y = this.dis.readInt();
-        this.receiver.receiveSet(x, y);
+        try {
+            this.receiver.receiveSet(x, y);
+        } catch (TicTacToeException e) {
+            System.err.println("cannot execute set - don't inform sender - error not part of protocol: "
+                    + e.getLocalizedMessage());
+        }
     }
 
     public void run() {

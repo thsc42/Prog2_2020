@@ -16,5 +16,5 @@ public interface TicTacToeReceive {
      * @param y
      * @throws IOException
      */
-    void receiveSet(int x, int y) throws IOException, StatusException;
+    void receiveSet(int x, int y) throws IOException, StatusException, TicTacToeException;
 }

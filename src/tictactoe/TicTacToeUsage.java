@@ -19,6 +19,6 @@ public interface TicTacToeUsage {
      * @param x 0..2
      * @param y 0..2
      */
-    void set(int x, int y) throws TicTacToeException, StatusException;
+    void set(int x, int y) throws TicTacToeException, StatusException, IOException;
 }
 
